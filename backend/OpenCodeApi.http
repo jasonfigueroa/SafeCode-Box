@@ -1,0 +1,6 @@
+@OpenCodeApi_HostAddress = http://localhost:5136
+
+GET {{OpenCodeApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,87 @@
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+<!-- * * * * * * * * * * * The content below * * * * * * * * * * * -->
+<!-- * * * * * * * * * * is only a placeholder * * * * * * * * * * -->
+<!-- * * * * * * * * * * and can be replaced.  * * * * * * * * * * -->
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+<!-- * * * * * * * * * Delete the template below * * * * * * * * * -->
+<!-- * * * * * * * to get started with your project! * * * * * * * -->
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+
+<style>
+  :host {
+    --gray-900: oklch(19.37% 0.006 300.98);
+    --gray-700: oklch(36.98% 0.014 302.71);
+    --gray-100: oklch(96.7% 0.001 286.37);
+    --blue-600: oklch(51.01% 0.274 263.83);
+    
+    font-family: "Inter", sans-serif;
+    display: block;
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    color: var(--gray-900);
+    margin-bottom: 1.5rem;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--gray-100);
+  }
+
+  th {
+    background-color: var(--blue-600);
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+  }
+
+  tr:hover {
+    background-color: var(--gray-100);
+  }
+</style>
+
+<main>
+  <h1>{{ title() }}</h1>
+  
+  @if (forecasts().length > 0) {
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Temp (C)</th>
+          <th>Temp (F)</th>
+          <th>Summary</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (forecast of forecasts(); track forecast.date) {
+          <tr>
+            <td>{{ forecast.date | date }}</td>
+            <td>{{ forecast.temperatureC }}°C</td>
+            <td>{{ forecast.temperatureF }}°F</td>
+            <td>{{ forecast.summary }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    } @else {
+      <p>Loading weather forecasts...</p>
+    }
+</main>
+
+<router-outlet />

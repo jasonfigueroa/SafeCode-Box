@@ -1,0 +1,19 @@
+# IDEs
+.vs/
+.vscode/
+bin/
+obj/
+node_modules/
+
+# OS files
+Thumbs.db
+Desktop.ini
+
+# Project specific
+build.log
+.opencode/
+*.user
+*.suo
+
+# Docker
+.docker/
