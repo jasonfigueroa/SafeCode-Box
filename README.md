@@ -38,17 +38,17 @@ function safecode-box {
     $winPath = (Get-Location).Path.Replace('\', '/')
     $wslPath = (wsl wslpath -u "$winPath").Trim()
     
-    docker network create opencode-net 2>$null | Out-Null
-    docker volume create opencode-data | Out-Null
+    docker network create safecode-net 2>$null | Out-Null
+    docker volume create safecode-data | Out-Null
 
     docker run -it --rm `
         --entrypoint "/usr/local/lib/node_modules/opencode-ai/bin/.opencode" `
-        --network opencode-net `
+        --network safecode-net `
         --add-host host.docker.internal:host-gateway `
         -p 4200:4200 -p 5000:5000 `
         -e TERM=xterm-256color `
         -v "$($wslPath):/app" `
-        -v "opencode-data:/root/.local/share/opencode" `
+        -v "safecode-data:/root/.local/share/opencode" `
         safecode-box:latest $args
 }
 ```
@@ -77,7 +77,7 @@ This project is configured to work with a SQL Server container named `mssql_stab
 
 **Start SQL Server:**
 ```powershell
-docker run --name mssql_stable -e 'ACCEPT_EULA=Y' -e 'MSSQL_SA_PASSWORD=YourPassword' -p 1433:1433 --network opencode-net --restart always -d mcr.microsoft.com/mssql/server:2022-latest
+docker run --name mssql_stable -e 'ACCEPT_EULA=Y' -e 'MSSQL_SA_PASSWORD=YourPassword' -p 1433:1433 --network safecode-net --restart always -d mcr.microsoft.com/mssql/server:2022-latest
 ```
 
 ## Authors

@@ -19,17 +19,17 @@ if ([string]::IsNullOrWhiteSpace($wslPath)) {
 }
 
 # Ensure networking and volumes exist
-docker network create opencode-net 2>$null | Out-Null
-docker volume create opencode-data | Out-Null
+docker network create safecode-net 2>$null | Out-Null
+docker volume create safecode-data | Out-Null
 
 Write-Host "📦 Launching SafeCode-Box..." -ForegroundColor Cyan
 
 docker run -it --rm `
     --entrypoint "/usr/local/lib/node_modules/opencode-ai/bin/.opencode" `
-    --network opencode-net `
+    --network safecode-net `
     --add-host host.docker.internal:host-gateway `
     -p 4200:4200 -p 5000:5000 `
     -e TERM=xterm-256color `
     -v "$($wslPath):/app" `
-    -v "opencode-data:/root/.local/share/opencode" `
+    -v "safecode-data:/root/.local/share/opencode" `
     safecode-box:latest $args
