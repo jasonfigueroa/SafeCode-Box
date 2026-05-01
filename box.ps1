@@ -4,7 +4,7 @@
 
 .DESCRIPTION
     This script maps the current directory into the safecode-box Docker container
-    and connects it to the shared 'opencode-net' network and 'opencode-data' volume.
+    and connects it to the shared 'safecode-net' network and 'safecode-data' volume.
 
 .EXAMPLE
     .\box.ps1 run "Summarize this project"
