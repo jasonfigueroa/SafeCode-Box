@@ -11,6 +11,11 @@ fi
 
 PROVIDER=$1
 
+if [ "$BOX_MODE" = "CORPORATE" ] && [ "$PROVIDER" = "opencode" ]; then
+    echo "Error: 'opencode' is disabled in CORPORATE mode."
+    exit 1
+fi
+
 if [ ! -f "$CONFIG_FILE" ]; then
     echo "Error: Configuration file not found at $CONFIG_FILE"
     exit 1
