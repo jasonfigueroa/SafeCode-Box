@@ -38,6 +38,11 @@ function safecode-box {
     $winPath = (Get-Location).Path.Replace('\', '/')
     $wslPath = (wsl wslpath -u "$winPath").Trim()
     
+    if ([string]::IsNullOrWhiteSpace($wslPath)) {
+        Write-Error "Failed to translate Windows path to WSL path."
+        return
+    }
+
     docker network create safecode-net 2>$null | Out-Null
     docker volume create safecode-data | Out-Null
 
