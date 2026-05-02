@@ -1,6 +1,6 @@
 # SafeCode-Box 🛡️
 
-**Version:** 1.0.0  
+**Version:** 1.1.0  
 **License:** [MIT](LICENSE)
 
 SafeCode-Box is a secure, isolated AI development environment built on top of [OpenCode](https://opencode.ai). It provides a "clean room" for AI agents to work on your code without having full access to your host machine's filesystem or sensitive data.
@@ -8,13 +8,23 @@ SafeCode-Box is a secure, isolated AI development environment built on top of [O
 ## Features
 
 - **Isolated AI Agent:** Runs OpenCode entirely within a Docker container.
+- **Default-Deny Policy:** All AI providers are disabled by default for maximum corporate safety.
 - **Pre-configured Tooling:** Includes .NET 10.0 SDK and Node.js 20.x.
+- **Log-Watcher Utility:** Automatically analyzes host-side build logs for legacy .NET 4.x projects.
 - **Enterprise-Ready Security:** 
-  - Public sharing of conversations is disabled by default.
+  - Public sharing of conversations is hard-locked to disabled.
   - No OpenCode installation required on the host machine.
   - Persistent AI identity stored in a dedicated Docker volume.
-- **Full-Stack Demo Included:** Contains a sample .NET 10 Web API, Angular frontend, and SQL Server setup.
-- **Oh My Posh Support:** Pre-configured for a beautiful, high-information terminal experience.
+- **Dual Modes:** Switch between strict `Corporate` and flexible `Personal` modes.
+
+## Project Structure
+
+- `Dockerfile`: The main recipe for the isolated agent.
+- `box.ps1`: A portable launcher script for Windows.
+- `configs/`: Governance templates used by the entrypoint.
+- `scripts/`: Internal management and initialization scripts.
+- `mcp/`: Custom "Model Context Protocol" servers (e.g., the build log analyzer).
+- `samples/`: Example projects (.NET 10 & Angular) to test the agent's capabilities.
 
 ## Prerequisites
 
@@ -35,55 +45,54 @@ Add the following function to your PowerShell profile (`$PROFILE`):
 
 ```powershell
 function safecode-box {
+    param([switch]$Personal, [Parameter(ValueFromRemainingArguments = $true)] [string[]]$RemainingArgs)
     $winPath = (Get-Location).Path.Replace('\', '/')
     $wslPath = (wsl wslpath -u "$winPath").Trim()
+    if ([string]::IsNullOrWhiteSpace($wslPath)) { return }
     
-    if ([string]::IsNullOrWhiteSpace($wslPath)) {
-        Write-Error "Failed to translate Windows path to WSL path."
-        return
-    }
-
     docker network create safecode-net 2>$null | Out-Null
     docker volume create safecode-data | Out-Null
+    $mode = if ($Personal) { "PERSONAL" } else { "CORPORATE" }
 
     docker run -it --rm `
-        --entrypoint "/usr/local/lib/node_modules/opencode-ai/bin/.opencode" `
         --network safecode-net `
         --add-host host.docker.internal:host-gateway `
         -p 4200:4200 -p 5000:5000 `
-        -e TERM=xterm-256color `
+        -e TERM=xterm-256color -e "BOX_MODE=$mode" `
         -v "$($wslPath):/app" `
         -v "safecode-data:/root/.local/share/opencode" `
-        safecode-box:latest $args
+        safecode-box:latest $RemainingArgs
 }
 ```
 
-### 3. Log in to your AI Provider
+### 3. Enable an AI Provider
+By default, all providers are disabled. To enable your corporate-approved provider (e.g., OpenAI), run:
+```powershell
+safecode-box safecode-box-allow openai
+```
+
+### 4. Log in
 ```powershell
 safecode-box auth login --provider openai
 ```
 
+## Security & Governance
+
+### Corporate Mode (Default)
+In Corporate mode, SafeCode-Box applies a "Default Deny" policy. The `enabled_providers` list is empty, and the free `opencode` (Zen) provider is explicitly blacklisted. This prevents the agent from sending code to unvetted public models.
+
+### Personal Mode
+For local experimentation, you can launch in Personal mode:
+```powershell
+safecode-box -Personal
+```
+This allows access to all providers, including the free models, while still keeping public sharing disabled.
+
 ## Working with Legacy Projects (.NET 4.x)
 
-Since the container runs on Linux, it cannot compile .NET 4.x code directly. Use the **Log-Watcher** workflow:
-
-1. Run your build on the Windows host and redirect output to a file:
-   ```powershell
-   msbuild /v:m > build.log
-   ```
-2. Ask the agent in the box to check the log:
-   *"I just ran a build on my host. Can you check build.log and fix the errors?"*
-
-The agent will read the log, identify the errors, and apply fixes to the code inside the box.
-
-## Database Setup (Docker)
-
-This project is configured to work with a SQL Server container named `mssql_stable`.
-
-**Start SQL Server:**
-```powershell
-docker run --name mssql_stable -e 'ACCEPT_EULA=Y' -e 'MSSQL_SA_PASSWORD=YourPassword' -p 1433:1433 --network safecode-net --restart always -d mcr.microsoft.com/mssql/server:2022-latest
-```
+Use the **Log-Watcher** workflow:
+1. Run your build on Windows: `msbuild /v:m > build.log`
+2. Ask the agent: *"I just ran a build on my host. Can you check build.log and fix the errors?"*
 
 ## Authors
-- Jason & OpenCode AI
+- Jason Figueroa & OpenCode AI
