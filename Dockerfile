@@ -24,7 +24,10 @@ COPY configs/corporate-template.json /usr/local/share/safecode-box/
 COPY configs/personal-template.json /usr/local/share/safecode-box/
 COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY scripts/safecode-box-allow.sh /usr/local/bin/safecode-box-allow
-RUN chmod +x /usr/local/bin/entrypoint.sh /usr/local/bin/safecode-box-allow
+# Normalize line endings in case of Windows host and set permissions
+RUN sed -i 's/\r$//' /usr/local/bin/entrypoint.sh && \
+    sed -i 's/\r$//' /usr/local/bin/safecode-box-allow && \
+    chmod +x /usr/local/bin/entrypoint.sh /usr/local/bin/safecode-box-allow
 
 # Standard binary path fix for OpenCode in certain environments
 RUN ln -s /usr/local/lib/node_modules/opencode-ai/bin/.opencode /usr/local/bin/opencode-bin
