@@ -1,0 +1,10 @@
+.git
+.vscode
+.vs
+node_modules
+**/bin
+**/obj
+build.log
+.opencode
+*.user
+*.suo

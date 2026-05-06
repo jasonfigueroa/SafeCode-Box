@@ -22,6 +22,29 @@ param(
     [string[]]$RemainingArgs
 )
 
+if ($RemainingArgs.Count -ge 1 -and $RemainingArgs[0] -eq 'allow') {
+    if ($RemainingArgs.Count -lt 2) {
+        Write-Error "Usage: .\box.ps1 allow <provider-id>"
+        exit 1
+    }
+
+    $provider = $RemainingArgs[1]
+    $mode = if ($Personal) { "PERSONAL" } else { "CORPORATE" }
+    $winPath = $PWD.Path.Replace('\', '/')
+    $wslPath = (wsl wslpath -u "$winPath").Trim()
+
+    docker network create safecode-net 2>$null | Out-Null
+    docker volume create safecode-data | Out-Null
+
+    docker run --rm `
+        --network safecode-net `
+        --add-host host.docker.internal:host-gateway `
+        -e "BOX_MODE=$mode" `
+        -v "safecode-data:/root/.local/share/opencode" `
+        safecode-box:latest safecode-box-allow $provider
+    exit $LASTEXITCODE
+}
+
 $winPath = $PWD.Path.Replace('\', '/')
 $wslPath = (wsl wslpath -u "$winPath").Trim()
 

@@ -3,15 +3,15 @@
 **Version:** 1.1.1  
 **License:** [MIT](LICENSE)
 
-SafeCode-Box is a secure, isolated AI development environment built on top of [OpenCode](https://opencode.ai). It provides a "clean room" for AI agents to work on your code without having full access to your host machine's filesystem or sensitive data.
+SafeCode-Box is a containerized AI development environment built on top of [OpenCode](https://opencode.ai). It reduces host exposure by running the agent inside Docker and mounting only the workspace you choose.
 
 ## Features
 
-- **Isolated AI Agent:** Runs OpenCode entirely within a Docker container.
+- **Isolated AI Agent:** Runs OpenCode inside a Docker container.
 - **Default-Deny Policy:** All AI providers are disabled by default for maximum corporate safety.
 - **Pre-configured Tooling:** Includes .NET 10.0 SDK and Node.js 20.x.
 - **Log-Watcher Utility:** Automatically analyzes host-side build logs for legacy .NET 4.x projects.
-- **Enterprise-Ready Security:** 
+- **Enterprise-Ready Security:**
   - Public sharing of conversations is hard-locked to disabled.
   - No OpenCode installation required on the host machine.
   - Persistent AI identity stored in a dedicated Docker volume.
@@ -68,7 +68,7 @@ function safecode-box {
 ### 3. Enable an AI Provider
 By default, all providers are disabled. To enable your corporate-approved provider (e.g., OpenAI), run:
 ```powershell
-safecode-box safecode-box-allow openai
+.\box.ps1 allow openai
 ```
 
 ### 4. Log in
@@ -79,7 +79,7 @@ safecode-box auth login --provider openai
 ## Security & Governance
 
 ### Corporate Mode (Default)
-In Corporate mode, SafeCode-Box applies a "Default Deny" policy. The `enabled_providers` list is empty, and the free `opencode` (Zen) provider is explicitly blacklisted. This prevents the agent from sending code to unvetted public models.
+In Corporate mode, SafeCode-Box reapplies a "Default Deny" policy on launch. The `enabled_providers` list is cleared, and the free `opencode` (Zen) provider is explicitly blacklisted.
 
 ### Personal Mode
 For local experimentation, you can launch in Personal mode:
