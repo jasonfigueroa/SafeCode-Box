@@ -9,19 +9,17 @@ SafeCode-Box is a secure, isolated AI development environment built on top of [O
 
 - **Isolated AI Agent:** Runs OpenCode entirely within a Docker container.
 - **Default-Deny Policy:** All AI providers are disabled by default for maximum corporate safety.
+- **Persistent Settings:** Your default models, aliases, and allow-lists are now saved between sessions in a Docker volume.
+- **Immutable Security Layer:** Core security rules (blocking free models and sharing) are baked into the image and cannot be overridden by user settings.
 - **Pre-configured Tooling:** Includes .NET 10.0 SDK and Node.js 20.x.
 - **Log-Watcher Utility:** Automatically analyzes host-side build logs for legacy .NET 4.x projects.
-- **Enterprise-Ready Security:** 
-  - Public sharing of conversations is hard-locked to disabled.
-  - No OpenCode installation required on the host machine.
-  - Persistent AI identity stored in a dedicated Docker volume.
 - **Dual Modes:** Switch between strict `Corporate` and flexible `Personal` modes.
 
 ## Project Structure
 
 - `Dockerfile`: The main recipe for the isolated agent.
 - `box.ps1`: A portable launcher script for Windows.
-- `configs/`: Governance templates used by the entrypoint.
+- `configs/`: Governance and default configuration templates.
 - `scripts/`: Internal management and initialization scripts.
 - `mcp/`: Custom "Model Context Protocol" servers (e.g., the build log analyzer).
 - `samples/`: Example projects (.NET 10 & Angular) to test the agent's capabilities.

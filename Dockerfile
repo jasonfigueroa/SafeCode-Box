@@ -18,19 +18,20 @@ RUN wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh && \
 # Install OpenCode CLI
 RUN npm install -g opencode-ai@latest --unsafe-perm
 
-# Setup SafeCode-Box Governance
+# Setup SafeCode-Box Governance Templates
 RUN mkdir -p /usr/local/share/safecode-box
-COPY configs/corporate-template.json /usr/local/share/safecode-box/
-COPY configs/personal-template.json /usr/local/share/safecode-box/
+COPY configs/system-lock.json /usr/local/share/safecode-box/
+COPY configs/corporate-defaults.json /usr/local/share/safecode-box/
+COPY configs/personal-defaults.json /usr/local/share/safecode-box/
+
+# Copy scripts
 COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY scripts/safecode-box-allow.sh /usr/local/bin/safecode-box-allow
-# Normalize line endings in case of Windows host and set permissions
+
+# Normalize line endings and set permissions
 RUN sed -i 's/\r$//' /usr/local/bin/entrypoint.sh && \
     sed -i 's/\r$//' /usr/local/bin/safecode-box-allow && \
     chmod +x /usr/local/bin/entrypoint.sh /usr/local/bin/safecode-box-allow
-
-# Standard binary path fix for OpenCode in certain environments
-RUN ln -s /usr/local/lib/node_modules/opencode-ai/bin/.opencode /usr/local/bin/opencode-bin
 
 WORKDIR /app
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
