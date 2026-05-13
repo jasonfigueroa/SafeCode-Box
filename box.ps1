@@ -42,7 +42,10 @@ Write-Host "📦 Launching SafeCode-Box in $mode mode..." -ForegroundColor $colo
 docker run -it --rm `
     --network safecode-net `
     --add-host host.docker.internal:host-gateway `
-    -p 4200:4200 -p 5000:5000 `
+    # Forwarding port 1455 is a ChatGPT Plus browser-based authentication workaround
+    -p 1455:1455 `
+    -p 4200:4200 `
+    -p 5000:5000 `
     -e TERM=xterm-256color `
     -e "BOX_MODE=$mode" `
     -v "$($wslPath):/app" `

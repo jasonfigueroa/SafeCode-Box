@@ -55,8 +55,12 @@ function safecode-box {
     docker run -it --rm `
         --network safecode-net `
         --add-host host.docker.internal:host-gateway `
-        -p 4200:4200 -p 5000:5000 `
-        -e TERM=xterm-256color -e "BOX_MODE=$mode" `
+        # Forwarding port 1455 is a ChatGPT Plus browser-based authentication workaround
+        -p 1455:1455 `
+        -p 4200:4200 `
+        -p 5000:5000 `
+        -e TERM=xterm-256color `
+        -e "BOX_MODE=$mode" `
         -v "$($wslPath):/app" `
         -v "safecode-data:/root/.local/share/opencode" `
         safecode-box:latest $RemainingArgs
@@ -73,6 +77,10 @@ safecode-box safecode-box-allow openai
 ```powershell
 safecode-box auth login --provider openai
 ```
+
+### ChatGPT Plus Workaround
+
+During browser-based authentication from the host, authentication will not complete until port 1455 is forwarded into the container with -p 1455:1455. This looks consistent with a known Codex/OpenAI OAuth callback issue. Port 1455 appears to be the local loopback callback port used during ChatGPT/Codex sign-in, and remote/container/SSH setups often need it forwarded for auth to complete. Reference: https://github.com/jasonfigueroa/SafeCode-Box/issues/12
 
 ## Security & Governance
 
@@ -93,4 +101,4 @@ Use the **Log-Watcher** workflow:
 2. Ask the agent: *"I just ran a build on my host. Can you check build.log and fix the errors?"*
 
 ## Authors
-- Jason Figueroa & OpenCode AI
+- Jason Figueroa, OpenCode AI and OpenClaw
