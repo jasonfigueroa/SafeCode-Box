@@ -83,6 +83,10 @@ safecode-box safecode-box-allow openai
 safecode-box auth login --provider openai
 ```
 
+### ChatGPT Plus Workaround
+
+During browser-based authentication from the host, authentication will not complete until port 1455 is forwarded into the container with -p 1455:1455. This looks consistent with a known Codex/OpenAI OAuth callback issue. Port 1455 appears to be the local loopback callback port used during ChatGPT/Codex sign-in, and remote/container/SSH setups often need it forwarded for auth to complete. Reference: https://github.com/jasonfigueroa/SafeCode-Box/issues/12
+
 ## Security & Governance
 
 ### Corporate Mode (Default)
@@ -102,4 +106,4 @@ Use the **Log-Watcher** workflow:
 2. Ask the agent: *"I just ran a build on my host. Can you check build.log and fix the errors?"*
 
 ## Authors
-- Jason Figueroa & OpenCode AI
+- Jason Figueroa, OpenCode AI and OpenClaw
