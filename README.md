@@ -1,27 +1,25 @@
 # SafeCode-Box 🛡️
 
-**Version:** 1.1.0  
+**Version:** 0.1.0  
 **License:** [MIT](LICENSE)
 
-SafeCode-Box is a containerized AI development environment built on top of [OpenCode](https://opencode.ai). It reduces host exposure by running the agent inside Docker and mounting only the workspace you choose, but it is not a full clean-room or sandbox boundary.
+SafeCode-Box is a secure, isolated AI development environment built on top of [OpenCode](https://opencode.ai). It provides a "clean room" for AI agents to work on your code without having full access to your host machine's filesystem or sensitive data.
 
 ## Features
 
-- **Isolated AI Agent:** Runs OpenCode inside a Docker container, with host exposure limited by the mounts and network settings you configure.
+- **Isolated AI Agent:** Runs OpenCode entirely within a Docker container.
 - **Default-Deny Policy:** All AI providers are disabled by default for maximum corporate safety.
+- **Persistent Settings:** Your default models, aliases, and allow-lists are now saved between sessions in a Docker volume.
+- **Immutable Security Layer:** Core security rules (blocking free models and sharing) are baked into the image and cannot be overridden by user settings.
 - **Pre-configured Tooling:** Includes .NET 10.0 SDK and Node.js 20.x.
 - **Log-Watcher Utility:** Automatically analyzes host-side build logs for legacy .NET 4.x projects.
-- **Enterprise-Ready Security:** 
-  - Public sharing of conversations is hard-locked to disabled.
-  - No OpenCode installation required on the host machine.
-  - Persistent AI identity stored in a dedicated Docker volume.
 - **Dual Modes:** Switch between strict `Corporate` and flexible `Personal` modes.
 
 ## Project Structure
 
 - `Dockerfile`: The main recipe for the isolated agent.
 - `box.ps1`: A portable launcher script for Windows.
-- `configs/`: Governance templates used by the entrypoint.
+- `configs/`: Governance and default configuration templates.
 - `scripts/`: Internal management and initialization scripts.
 - `mcp/`: Custom "Model Context Protocol" servers (e.g., the build log analyzer).
 - `samples/`: Example projects (.NET 10 & Angular) to test the agent's capabilities.
@@ -57,9 +55,12 @@ function safecode-box {
     docker run -it --rm `
         --network safecode-net `
         --add-host host.docker.internal:host-gateway `
+        # Forwarding port 1455 is a ChatGPT Plus browser-based authentication workaround
         -p 1455:1455 `
-        -p 4200:4200 -p 5000:5000 `
-        -e TERM=xterm-256color -e "BOX_MODE=$mode" `
+        -p 4200:4200 `
+        -p 5000:5000 `
+        -e TERM=xterm-256color `
+        -e "BOX_MODE=$mode" `
         -v "$($wslPath):/app" `
         -v "safecode-data:/root/.local/share/opencode" `
         safecode-box:latest $RemainingArgs
@@ -77,25 +78,11 @@ safecode-box safecode-box-allow openai
 safecode-box auth login --provider openai
 ```
 
-### Browser auth workaround
-If browser-based authentication from the host does not complete, add this extra port forward to the launcher:
+### ChatGPT Plus Workaround
 
-```powershell
--p 1455:1455
-```
-
-This was required in one environment for ChatGPT Plus authentication, but the underlying service or callback path is not yet identified. Keep it in place until the dependency is understood.
+During browser-based authentication from the host, authentication will not complete until port 1455 is forwarded into the container with -p 1455:1455. This looks consistent with a known Codex/OpenAI OAuth callback issue. Port 1455 appears to be the local loopback callback port used during ChatGPT/Codex sign-in, and remote/container/SSH setups often need it forwarded for auth to complete. Reference: https://github.com/jasonfigueroa/SafeCode-Box/issues/12
 
 ## Security & Governance
-
-### Boundary and Isolation Model
-SafeCode-Box is meant to lower risk by:
-- running OpenCode in Docker,
-- mounting only the chosen workspace into `/app`,
-- persisting OpenCode state in a named Docker volume, and
-- controlling provider access through startup policy.
-
-It does **not** aim to be a complete isolation boundary. The container still has access to the mounted workspace, the shared network, and `host.docker.internal`.
 
 ### Corporate Mode (Default)
 In Corporate mode, SafeCode-Box applies a "Default Deny" policy. The `enabled_providers` list is empty, and the free `opencode` (Zen) provider is explicitly blacklisted. This prevents the agent from sending code to unvetted public models.
@@ -114,4 +101,4 @@ Use the **Log-Watcher** workflow:
 2. Ask the agent: *"I just ran a build on my host. Can you check build.log and fix the errors?"*
 
 ## Authors
-- Jason Figueroa & OpenCode AI
+- Jason Figueroa, OpenCode AI and OpenClaw
