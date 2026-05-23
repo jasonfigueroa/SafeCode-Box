@@ -42,4 +42,4 @@ fi
 export OPENCODE_CONFIG="$USER_CONFIG_FILE"
 
 # Execute the original command
-exec /usr/local/lib/node_modules/opencode-ai/bin/.opencode "$@"
+exec opencode "$@"
