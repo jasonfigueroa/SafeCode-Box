@@ -1,6 +1,6 @@
 # SafeCode-Box 🛡️
 
-**Version:** 0.1.0  
+**Version:** 0.1.3
 **License:** [MIT](LICENSE)
 
 SafeCode-Box is a secure, isolated AI development environment built on top of [OpenCode](https://opencode.ai). It provides a "clean room" for AI agents to work on your code without having full access to your host machine's filesystem or sensitive data.
