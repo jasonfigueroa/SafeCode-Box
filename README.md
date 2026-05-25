@@ -69,6 +69,8 @@ function safecode-box {
         '-e', "BOX_MODE=$mode"
         '-v', "$($wslPath):/app"
         '-v', 'safecode-data:/root/.local/share/opencode'
+        # Uncomment the following to enable OpenCode Themes
+        # '-v', '/var/lib/docker/volumes/safecode-data/_data/tui.json:/root/.config/opencode/tui.json'
         'safecode-box:latest'
     )
     docker @dockerArgs $RemainingArgs
@@ -84,6 +86,36 @@ safecode-box safecode-box-allow openai
 ### 4. Log in
 ```powershell
 safecode-box auth login --provider openai
+```
+
+### 5. Set Default Model/Mode (Optional)
+Add `model` (default model) and `default_agent` (default mode) to `/var/lib/docker/volumes/safecode-data/_data/opencode.json`.
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "openai/gpt-5.4-mini",
+  "default_agent": "plan"
+}
+```
+
+### 6. Set Theme (Optional)
+Create `/var/lib/docker/volumes/safecode-data/_data/tui.json` and add the following to it.
+```json
+{
+  "$schema": "https://opencode.ai/tui.json",
+  "theme": "tokyonight"
+}
+```
+
+Add the following to `safecode-box` PowerShell function.
+```powershell
+        ...
+        '-v', 'safecode-data:/root/.local/share/opencode'
++       '-v', '/var/lib/docker/volumes/safecode-data/_data/tui.json:/root/.config/opencode/tui.json'
+        'safecode-box:latest'
+    )
+    docker @dockerArgs $RemainingArgs
+}
 ```
 
 ### ChatGPT Plus Workaround
