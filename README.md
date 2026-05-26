@@ -141,4 +141,4 @@ Use the **Log-Watcher** workflow:
 2. Ask the agent: *"I just ran a build on my host. Can you check build.log and fix the errors?"*
 
 ## Authors
-- Jason Figueroa, OpenCode AI and OpenClaw
+- Jason Figueroa, [OpenCode](https://opencode.ai) and [OpenClaw](https://openclaw.ai/)
